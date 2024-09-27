@@ -35,7 +35,13 @@ jobs:
 
         # Set up the application
         cd /home/useradmin/app
+
+        python3 -m venv venv
+        source venv/bin/activate
+
         sudo pip3 install -r requirements.txt
+
+        deactivate
 
         # Set up systemd service
         sudo tee /etc/systemd/system/fastapi.service > /dev/null << EOT
@@ -46,7 +52,7 @@ jobs:
         [Service]
         User=azureuser
         WorkingDirectory=/home/azureuser/app
-        ExecStart=/usr/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+        ExecStart=/home/useradmin/app/venv/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
         Restart=always
 
         [Install]
