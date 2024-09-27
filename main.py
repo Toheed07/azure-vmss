@@ -22,7 +22,7 @@ app = FastAPI(title="PanduAI Backend", version="0.1.0")
 
 @app.get("/")
 def health_check():
-    return {"message": "welcome"}
+    return {"message": "welcome here"}
 
 
 
@@ -30,7 +30,9 @@ def health_check():
 def health_check():
     return {"status": "ok"}
 
-
+@app.get("/welcome")
+def health_check():
+    return {"status": "this is a test"}
 
 app = CORSMiddleware(
     app=app,
