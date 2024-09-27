@@ -36,13 +36,13 @@ jobs:
       uses: azure/CLI@v1
       with:
         inlineScript: |
-          az storage container create --name scripts --account-name ${{ env.AZURE_STORAGE_ACCOUNT }} --auth-mode login
+            az storage container create --name scripts --account-name ${{ env.AZURE_STORAGE_ACCOUNT }} --auth-mode login
 
     - name: Upload deployment scripts to Azure Storage
       uses: azure/CLI@v1
       with:
         inlineScript: |
-          az storage blob upload-batch -d scripts --account-name ${{ env.AZURE_STORAGE_ACCOUNT }} -s ./scripts --auth-mode login
+          az storage blob upload-batch -d scripts --account-name pandutoheed -s /Users/toheed/Projects/dummy/scripts --auth-mode login
           
     - name: Update VMSS model and trigger update
       uses: azure/CLI@v1

@@ -53,14 +53,6 @@ fsspec==2024.6.0
 future==1.0.0
 gdown==5.2.0
 git-filter-repo==2.45.0
-google==3.0.0
-google-api-core==2.19.0
-google-api-python-client==2.133.0
-google-auth==2.30.0
-google-auth-httplib2==0.2.0
-google-auth-oauthlib==1.2.0
-google-cloud-vision==3.7.2
-googleapis-common-protos==1.63.1
 grpcio==1.64.1
 grpcio-status==1.62.2
 h11==0.12.0
