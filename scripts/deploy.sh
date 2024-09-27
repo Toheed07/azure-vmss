@@ -43,7 +43,8 @@
     # Start the service
     sudo systemctl daemon-reload
     sudo systemctl enable fastapi
-    sudo systemctl start fastapi
+    sudo systemctl restart fastapi
+
 
     echo "Deployment completed successfully"
     EOF

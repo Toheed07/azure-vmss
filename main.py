@@ -22,7 +22,7 @@ app = FastAPI(title="PanduAI Backend", version="0.1.0")
 
 @app.get("/")
 def health_check():
-    return {"message": "welcome here"}
+    return {"message": "welcome here, people"}
 
 
 
