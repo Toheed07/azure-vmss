@@ -41,8 +41,6 @@ jobs:
 
         sudo pip3 install -r requirements.txt
 
-        deactivate
-
         # Set up systemd service
         sudo tee /etc/systemd/system/fastapi.service > /dev/null << EOT
         [Unit]
