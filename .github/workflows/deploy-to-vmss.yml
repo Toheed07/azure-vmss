@@ -51,7 +51,7 @@ jobs:
       with:
         inlineScript: |
           az storage container create --name scripts --account-name ${{ env.AZURE_STORAGE_ACCOUNT }} --auth-mode login
-          az storage blob upload --container-name scripts --file ./scripts/deploy.sh --name deploy.sh --account-name ${{ env.AZURE_STORAGE_ACCOUNT }} --auth-mode login --content-type "text/x-sh"
+          az storage blob upload --container-name scripts --file ./scripts/deploy.sh --name deploy.sh --account-name ${{ env.AZURE_STORAGE_ACCOUNT }} --auth-mode login --content-type "text/x-sh"  --overwrite
 
     - name: List blobs in scripts container
       uses: azure/CLI@v1
