@@ -17,6 +17,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: List scripts directory
+      run: |
+        ls -R scripts
+
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
@@ -36,7 +40,13 @@ jobs:
       uses: azure/CLI@v1
       with:
         inlineScript: |
-          az storage blob upload-batch -d scripts --account-name ${{ env.AZURE_STORAGE_ACCOUNT }} -s ./scripts --auth-mode login
+          az storage blob upload-batch -d scripts --account-name ${{ env.AZURE_STORAGE_ACCOUNT }} -s ./scripts --auth-mode login --verbose
+
+    - name: List blobs in scripts container
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          az storage blob list --container-name scripts --account-name ${{ env.AZURE_STORAGE_ACCOUNT }} --auth-mode login --output table
 
     - name: Generate SAS token
       id: sas
