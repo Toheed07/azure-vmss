@@ -34,7 +34,8 @@
     WorkingDirectory=/home/useradmin/app
     ExecStart=/home/useradmin/app/venv/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
     Restart=always
-
+    Environment="PATH=/home/useradmin/app/venv/bin"  
+    
     [Install]
     WantedBy=multi-user.target
     EOT
