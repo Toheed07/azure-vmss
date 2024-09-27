@@ -7,7 +7,7 @@ on:
 env:
   AZURE_RESOURCE_GROUP: demo
   AZURE_VMSS_NAME: pandu-ai
-  PYTHON_VERSION: '3.9.8'
+  PYTHON_VERSION: '3.10.12'
   AZURE_STORAGE_ACCOUNT: pandutoheed
 
 jobs:
