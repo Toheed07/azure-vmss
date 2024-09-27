@@ -17,29 +17,52 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Create deploy.sh if it doesn't exist
+    - name: Create deploy.sh
       run: |
         mkdir -p scripts
-        if [ ! -f scripts/deploy.sh ]; then
-          echo '#!/bin/bash' > scripts/deploy.sh
-          echo 'echo "Deployment script executed successfully"' >> scripts/deploy.sh
-        fi
+        cat << 'EOF' > scripts/deploy.sh
+        #!/bin/bash
+        set -e
+
+        # Update and install dependencies
+        sudo apt-get update
+        sudo apt-get install -y python3-pip git
+
+        # Clone the repository
+        git clone https://github.com/yourusername/yourrepository.git /home/azureuser/app
+
+        # Set up the application
+        cd /home/azureuser/app
+        sudo pip3 install -r requirements.txt
+
+        # Set up systemd service
+        sudo tee /etc/systemd/system/fastapi.service > /dev/null << EOT
+        [Unit]
+        Description=FastAPI application
+        After=network.target
+
+        [Service]
+        User=azureuser
+        WorkingDirectory=/home/azureuser/app
+        ExecStart=/usr/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+        Restart=always
+
+        [Install]
+        WantedBy=multi-user.target
+        EOT
+
+        # Start the service
+        sudo systemctl daemon-reload
+        sudo systemctl enable fastapi
+        sudo systemctl start fastapi
+
+        echo "Deployment completed successfully"
+        EOF
+
         chmod +x scripts/deploy.sh
 
-    - name: List scripts directory
-      run: |
-        ls -R scripts
-        cat scripts/deploy.sh
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+    - name: Display deploy.sh contents
+      run: cat scripts/deploy.sh
 
     - name: Azure Login
       uses: azure/login@v1
@@ -51,13 +74,7 @@ jobs:
       with:
         inlineScript: |
           az storage container create --name scripts --account-name ${{ env.AZURE_STORAGE_ACCOUNT }} --auth-mode login
-          az storage blob upload --container-name scripts --file ./scripts/deploy.sh --name deploy.sh --account-name ${{ env.AZURE_STORAGE_ACCOUNT }} --auth-mode login --content-type "text/x-sh"  --overwrite
-
-    - name: List blobs in scripts container
-      uses: azure/CLI@v1
-      with:
-        inlineScript: |
-          az storage blob list --container-name scripts --account-name ${{ env.AZURE_STORAGE_ACCOUNT }} --auth-mode login --output table
+          az storage blob upload --container-name scripts --file ./scripts/deploy.sh --name deploy.sh --account-name ${{ env.AZURE_STORAGE_ACCOUNT }} --auth-mode login --content-type "text/x-sh"
 
     - name: Generate SAS token
       id: sas
@@ -66,7 +83,7 @@ jobs:
         inlineScript: |
           end=`date -u -d "30 minutes" '+%Y-%m-%dT%H:%MZ'`
           sas=`az storage container generate-sas -n scripts --account-name ${{ env.AZURE_STORAGE_ACCOUNT }} --permissions r --expiry $end --auth-mode login --as-user --output tsv`
-          echo "::set-output name=token::$sas"
+          echo "token=$sas" >> $GITHUB_OUTPUT
 
     - name: Update VMSS model and trigger update
       uses: azure/CLI@v1
