@@ -39,7 +39,9 @@ jobs:
         python3 -m venv venv
         source venv/bin/activate
 
-        sudo pip3 install -r requirements.txt
+        sudo chown -R useradmin:useradmin /home/useradmin/app/venv
+
+        pip3 install -r requirements.txt
 
         # Set up systemd service
         sudo tee /etc/systemd/system/fastapi.service > /dev/null << EOT
