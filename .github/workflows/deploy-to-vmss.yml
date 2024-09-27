@@ -75,7 +75,7 @@ jobs:
       uses: azure/CLI@v1
       with:
         inlineScript: |
-          fileUri="https://${{ env.AZURE_STORAGE_ACCOUNT }}.blob.core.windows.net/scripts/deploy.sh?${{ steps.sas.outputs.token }}"
+          fileUri="https://${{ env.AZURE_STORAGE_ACCOUNT }}.blob.core.windows.net/scripts/deployment_scripts.txt?${{ steps.sas.outputs.token }}"
           az vmss extension set \
             --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
             --vmss-name ${{ env.AZURE_VMSS_NAME }} \
