@@ -17,6 +17,16 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Ensure correct line endings and permissions
+      run: |
+        sudo apt-get install -y dos2unix
+        dos2unix scripts/deploy.sh
+        chmod +x scripts/deploy.sh
+
+    - name: List scripts directory
+      run: |
+        ls -R scripts
+
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
@@ -36,7 +46,21 @@ jobs:
       uses: azure/CLI@v1
       with:
         inlineScript: |
-          az storage blob upload-batch -d scripts --account-name ${{ env.AZURE_STORAGE_ACCOUNT }} -s ./scripts --auth-mode login
+          az storage blob upload --container-name scripts --file ./scripts/deploy.sh --name deploy.sh --account-name ${{ env.AZURE_STORAGE_ACCOUNT }} --auth-mode login --content-type "text/x-sh"
+
+    - name: List blobs in scripts container
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          az storage blob list --container-name scripts --account-name ${{ env.AZURE_STORAGE_ACCOUNT }} --auth-mode login --output table
+
+    - name: Download and display deploy.sh
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          az storage blob download --container-name scripts --name deploy.sh --file ./deploy.sh --account-name ${{ env.AZURE_STORAGE_ACCOUNT }} --auth-mode login
+          echo "Content of deploy.sh:"
+          cat ./deploy.sh
 
     - name: Generate SAS token
       id: sas
@@ -57,7 +81,7 @@ jobs:
             --vmss-name ${{ env.AZURE_VMSS_NAME }} \
             --name CustomScript \
             --publisher Microsoft.Azure.Extensions \
-            --settings "{\"fileUris\":[\"$fileUri\"],\"commandToExecute\":\"bash deploy.sh\"}"
+            --settings "{\"fileUris\":[\"$fileUri\"],\"commandToExecute\":\"ls -la && bash deploy.sh\"}"
           
           az vmss update-instances --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.AZURE_VMSS_NAME }} --instance-ids "*"
 
