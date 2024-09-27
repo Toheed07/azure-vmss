@@ -32,28 +32,32 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Create scripts container if not exists
-      uses: azure/CLI@v1
-      with:
-        inlineScript: |
-            az storage container create --name scripts --account-name ${{ env.AZURE_STORAGE_ACCOUNT }} --auth-mode login
-
     - name: Upload deployment scripts to Azure Storage
       uses: azure/CLI@v1
       with:
         inlineScript: |
-          az storage blob upload-batch -d scripts --account-name pandutoheed -s ./scripts --auth-mode login
-          
+          az storage blob upload-batch -d scripts --account-name ${{ env.AZURE_STORAGE_ACCOUNT }} -s ./scripts --auth-mode login
+
+    - name: Generate SAS token
+      id: sas
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          end=`date -u -d "30 minutes" '+%Y-%m-%dT%H:%MZ'`
+          sas=`az storage container generate-sas -n scripts --account-name ${{ env.AZURE_STORAGE_ACCOUNT }} --permissions r --expiry $end --auth-mode login --as-user --output tsv`
+          echo "::set-output name=token::$sas"
+
     - name: Update VMSS model and trigger update
       uses: azure/CLI@v1
       with:
         inlineScript: |
+          fileUri="https://${{ env.AZURE_STORAGE_ACCOUNT }}.blob.core.windows.net/scripts/deploy.sh?${{ steps.sas.outputs.token }}"
           az vmss extension set \
             --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
             --vmss-name ${{ env.AZURE_VMSS_NAME }} \
             --name CustomScript \
             --publisher Microsoft.Azure.Extensions \
-            --settings '{"fileUris":["https://${{ env.AZURE_STORAGE_ACCOUNT }}.blob.core.windows.net/scripts/deploy.sh"],"commandToExecute":"bash deploy.sh"}'
+            --settings "{\"fileUris\":[\"$fileUri\"],\"commandToExecute\":\"bash deploy.sh\"}"
           
           az vmss update-instances --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.AZURE_VMSS_NAME }} --instance-ids "*"
 
