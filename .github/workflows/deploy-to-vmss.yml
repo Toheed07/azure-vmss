@@ -36,7 +36,7 @@ jobs:
       uses: azure/CLI@v1
       with:
         inlineScript: |
-          az storage blob upload-batch -d scripts --account-name ${{ env.AZURE_STORAGE_ACCOUNT }} -s ./deployment_scripts
+          az storage blob upload-batch -d scripts --account-name ${{ env.AZURE_STORAGE_ACCOUNT }} -s ./deployment_scripts --pattern "*.txt"
 
     - name: Update VMSS model and trigger update
       uses: azure/CLI@v1
