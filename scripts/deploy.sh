@@ -19,9 +19,9 @@
     python3 -m venv venv
     source venv/bin/activate
 
-    pip3 install -r requirements.txt
+    sudo chown -R useradmin:useradmin /home/useradmin/app/venv
 
-    deactivate
+    pip3 install -r requirements.txt
 
     # Set up systemd service
     cat << EOT > /etc/systemd/system/fastapi.service
