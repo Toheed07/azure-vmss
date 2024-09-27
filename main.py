@@ -1,5 +1,4 @@
 import uvicorn
-import httpx
 from fastapi import (
     FastAPI,
     Response,
