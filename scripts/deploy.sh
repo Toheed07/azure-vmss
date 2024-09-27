@@ -11,7 +11,7 @@
     sudo rm -rf /home/useradmin/app
 
     # Clone the repository
-    git clone https://github.com/yourusername/yourrepository.git /home/azureuser/app
+    git clone https://github.com/yourusername/yourrepository.git /home/useradmin/app
 
     # Set up the application
     cd /home/useradmin/app
