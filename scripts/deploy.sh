@@ -8,6 +8,8 @@
     sudo apt-get update
     sudo apt-get install -y python3-pip
 
+    sudo rm -rf /home/useradmin/app
+
     # Clone the repository
     git clone https://github.com/yourusername/yourrepository.git /home/azureuser/app
 
