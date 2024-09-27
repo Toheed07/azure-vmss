@@ -14,7 +14,7 @@
     git clone https://github.com/yourusername/yourrepository.git /home/azureuser/app
 
     # Set up the application
-    cd /home/azureuser/app
+    cd /home/useradmin/app
 
     python3 -m venv venv
     source venv/bin/activate
@@ -30,8 +30,8 @@
     After=network.target
 
     [Service]
-    User=azureuser
-    WorkingDirectory=/home/azureuser/app
+    User=useradmin
+    WorkingDirectory=/home/useradmin/app
     ExecStart=/home/useradmin/app/venv/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
     Restart=always
 
